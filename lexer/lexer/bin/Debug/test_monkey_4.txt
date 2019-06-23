@@ -1,0 +1,6 @@
+<S> -> da <A> <C>
+<A> -> [empty]
+<A> -> <B> la
+<B> -> raz
+<C> -> [empty]
+<C> -> ka <B>

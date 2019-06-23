@@ -1,0 +1,11 @@
+<P1> -> <P2> <X>
+<X> -> [empty]
+<X> -> ay <P2> <X>
+<P2> -> <P3> <Y>
+<Y> -> [empty]
+<Y> -> ky <P3> <Y>
+<P3> -> yx-ti
+<P3> -> xo <P3>
+<P3> -> ny <P4> <P2>
+<P4> -> [empty]
+<P4> -> oi <P1> kakoi

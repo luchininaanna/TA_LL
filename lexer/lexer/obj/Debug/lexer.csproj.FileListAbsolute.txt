@@ -1,0 +1,6 @@
+F:\6 семестр\TA\lexer\lexer\bin\Debug\lexer.exe
+F:\6 семестр\TA\lexer\lexer\bin\Debug\lexer.pdb
+F:\6 семестр\TA\lexer\lexer\obj\Debug\lexer.csprojResolveAssemblyReference.cache
+F:\6 семестр\TA\lexer\lexer\obj\Debug\lexer.csproj.CoreCompileInputs.cache
+F:\6 семестр\TA\lexer\lexer\obj\Debug\lexer.exe
+F:\6 семестр\TA\lexer\lexer\obj\Debug\lexer.pdb
