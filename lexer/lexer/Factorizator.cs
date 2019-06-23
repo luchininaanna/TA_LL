@@ -24,11 +24,13 @@ namespace lexer
         private List<DataForFactorization> dataForFacotization = new List<DataForFactorization>();
         private List<Rule> newGrammarList = new List<Rule>();
         private List<IndexOfTerminal> newIndexOfTerminal = new List<IndexOfTerminal>();
+        private List<TerminalList> newTerminalList = new List<TerminalList>();
 
         public void ApplyFactorization(ref GrammarConverter grammarConverter)
         {
             Console.WriteLine();
-            Console.WriteLine("Convert Function");
+            Console.WriteLine("CONVERT FANCTION!!!!!!!!!");
+            Console.WriteLine();
 
             while (isNeedToRepeatFactorization)
             {
@@ -44,14 +46,19 @@ namespace lexer
                     ToExstractFirstComponents(ref grammarList, ref currList);
                 }
 
-                Console.WriteLine("newGrammarList = " + newGrammarList.Count());
                 grammarConverter.SetGrammarList(newGrammarList);
 
                 UpdateTerminalIndexList();
                 grammarConverter.SetTerminalIndexList(newIndexOfTerminal);
 
+                UpdateTerminalList();
+                grammarConverter.SetTerminalList(newTerminalList);
+
+                grammarConverter.PrintGrammarList();
+
                 newGrammarList.Clear();
                 newIndexOfTerminal.Clear();
+                newTerminalList.Clear();
             }
 
         }
@@ -60,14 +67,14 @@ namespace lexer
         {
             for (int i = 0; i < currList.rowIndex.Count(); i++)
             {
-
                 int currIndex = currList.rowIndex[i];
 
-                Rule currRule = grammarList[currIndex - 1];
+                Rule currRule = grammarList[currIndex];
+
                 List<string> ruleСomposition = currRule.ruleСomposition;
 
                 string firstComponent = ruleСomposition[0];
-
+                
                 bool isExist = dataForFacotization.Exists(x => x.commonElement == firstComponent);
 
                 if (isExist)
@@ -84,8 +91,9 @@ namespace lexer
                     currData.indexList = new List<int> { currIndex };
                     dataForFacotization.Add(currData);
                 }
+                
+                
             }
-
 
             ToAnalyze(ref grammarList);
 
@@ -103,7 +111,7 @@ namespace lexer
                 {
                     //добавляем в правило
                     int index = dataForFacotization[i].indexList[0];
-                    Rule currRule = grammarList[index - 1];
+                    Rule currRule = grammarList[index];
                     newGrammarList.Add(currRule);
                 } else
                 {
@@ -115,10 +123,13 @@ namespace lexer
 
         private void Factorization(ref List<Rule> grammarList, int index)
         {
+            
             isNeedToRepeatFactorization = true;
 
             string rule = dataForFacotization[index].rule;
             string commonElement = dataForFacotization[index].commonElement;
+
+            Console.WriteLine("commonElement = " + commonElement);
 
             Rule newRule = new Rule();
             newRule.ruleName = rule;
@@ -129,16 +140,26 @@ namespace lexer
 
             for (int i = 0; i < dataForFacotization[index].indexList.Count(); i++)
             {
+
                 newRule = new Rule();
                 newRule.ruleName = "<" + ruleName + ruleIndex + ">";
                 newRule.guideSet = new List<string>();
                 newRule.ruleСomposition = new List<string>();
 
-                Rule currRule = grammarList[dataForFacotization[index].indexList[i] - 1];
+                int currIndex = dataForFacotization[index].indexList[i];
+                Rule currRule = grammarList[currIndex];
 
-                for (int j = 1; j < currRule.ruleСomposition.Count(); j++)
+                if (currRule.ruleСomposition.Count() > 1)
                 {
-                    newRule.ruleСomposition.Add(currRule.ruleСomposition[j]);
+                    for (int j = 1; j < currRule.ruleСomposition.Count(); j++)
+                    {
+                        Console.WriteLine("add " + currRule.ruleСomposition[j]);
+                        newRule.ruleСomposition.Add(currRule.ruleСomposition[j]);
+                    }
+                } else
+                {
+                    Console.WriteLine("add ");
+                    newRule.ruleСomposition.Add("[уь]");
                 }
 
                 newGrammarList.Add(newRule);
@@ -149,7 +170,7 @@ namespace lexer
 
         private void UpdateTerminalIndexList()
         {
-            int pos = 2;
+            int pos = 0;
 
             for (int i = 0; i < newGrammarList.Count; i++)
             {
@@ -165,7 +186,7 @@ namespace lexer
                     currIndexOfTerminal.startIndex = startIndex;
 
                     List<int> rowIndex = new List<int>();
-                    rowIndex.Add(i+1);
+                    rowIndex.Add(i);
                     currIndexOfTerminal.rowIndex = rowIndex;
 
                     newIndexOfTerminal.Add(currIndexOfTerminal);
@@ -175,7 +196,7 @@ namespace lexer
                 {
                     IndexOfTerminal currIndexOfTerminal = newIndexOfTerminal.Find(x => x.terminal == newGrammarList[i].ruleName);
                     currIndexOfTerminal.startIndex.Add(pos);
-                    currIndexOfTerminal.rowIndex.Add(i + 1);
+                    currIndexOfTerminal.rowIndex.Add(i);
                 }
 
                 pos += newGrammarList[i].ruleСomposition.Count();
@@ -183,6 +204,42 @@ namespace lexer
 
 
 
+        }
+
+        private void UpdateTerminalList()
+        {
+            for (int i = 0; i < newGrammarList.Count; i++)
+            {
+                Rule currRule = newGrammarList[i];
+
+                List<string> composition = currRule.ruleСomposition;
+
+                foreach (string element in composition)
+                {
+                    bool isTerminal = (element[0] == '<') && (element[element.Length - 1] == '>');
+
+                    if (isTerminal)
+                    {
+                        bool isExist = newTerminalList.Exists(x => x.terminal == element);
+
+                        if (!isExist)
+                        {
+                            TerminalList newTerninal;
+                            newTerninal.terminal = element;
+                            newTerninal.index = new List<int>();
+                            newTerninal.index.Add(i);
+                            newTerminalList.Add(newTerninal);
+                        }
+                        else
+                        {
+                            //узнать индекс
+                            TerminalList currTerminalList = newTerminalList.Find(x => x.terminal.Contains(element));
+                            currTerminalList.index.Add(i);
+                        }
+                    }
+                }
+
+            }
         }
     }
 }

@@ -13,7 +13,7 @@ namespace lexer
 
         public void ExtractData(ref GrammarConverter grammarConverter)
         {
-            System.IO.StreamReader file = new System.IO.StreamReader("test_monkey_1.txt");
+            System.IO.StreamReader file = new System.IO.StreamReader("factorization_test_2.txt");
 
             string line;
             int rawIndex = 0;

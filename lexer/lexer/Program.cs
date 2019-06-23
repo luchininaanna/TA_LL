@@ -13,19 +13,17 @@ namespace lexer
             GrammarConverter grammarConverter = new GrammarConverter();
 
             fileHandler.ExtractData(ref grammarConverter);
+            grammarConverter.InitializeStartRule();
 
-            grammarConverter.DefineGuideSet();
+            Factorizator factorizator = new Factorizator();
+            factorizator.ApplyFactorization(ref grammarConverter);
+
+            //grammarConverter.DefineGuideSet();
 
             grammarConverter.PrintTerminalList();
             grammarConverter.PrintGuideSet();
             grammarConverter.PrintIndex();
             grammarConverter.PrintGrammarList();
-
-            //Factorizator factorizator = new Factorizator();
-            //factorizator.ApplyFactorization(ref grammarConverter);
-
-            //grammarConverter.PrintGrammarList();
-            //grammarConverter.PrintIndex();
 
             //List<RowInTable> table = grammarConverter.CreateTable();
             //grammarConverter.PrintTable();

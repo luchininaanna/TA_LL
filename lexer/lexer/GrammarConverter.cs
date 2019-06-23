@@ -64,11 +64,24 @@ namespace lexer
         }
         public void SetGrammarList(List<Rule> newGrammarList)
         {
-            grammarList = newGrammarList;
+            grammarList.Clear();
+
+            foreach (Rule rule in newGrammarList)
+            {
+                grammarList.Add(rule);
+            }
         }
         public List<TerminalList> GetTerminalList()
         {
             return terminalList;
+        }
+        public void SetTerminalList(List<TerminalList> newTerminalList)
+        {
+            terminalList.Clear();
+            foreach(TerminalList element in newTerminalList)
+            {
+                terminalList.Add(element);
+            }
         }
         public List<IndexOfTerminal> GetIndexOfTerminalList()
         {
@@ -76,7 +89,11 @@ namespace lexer
         }
         public void SetTerminalIndexList(List<IndexOfTerminal> newIndexOfTerminalList)
         {
-            indexOfTerminalList = newIndexOfTerminalList;
+            indexOfTerminalList.Clear();
+            foreach (IndexOfTerminal element in newIndexOfTerminalList)
+            {
+                indexOfTerminalList.Add(element);
+            }
         }
         public List<RowInTable> GetGrammarTable()
         {
@@ -238,8 +255,10 @@ namespace lexer
             }
         }
 
-        private void InitializeStartRule(string terminal, ref List<Rule> grammarList)
+        public void InitializeStartRule()
         {
+            string terminal = grammarList[0].ruleName;
+
             Rule newRule;
             newRule.ruleName = "<Start>";
 
@@ -428,8 +447,6 @@ namespace lexer
             List<string> currSet = new List<string>();
             bool isFirstRule = false;
             bool isChanges = true;
-
-            InitializeStartRule(grammarList[0].ruleName, ref grammarList);
 
             while (isChanges)
             {
