@@ -62,31 +62,19 @@ namespace lexer
         {
             return grammarList;
         }
-        public void SetGrammarList(List<Rule> newGrammarList)
-        {
-            grammarList.Clear();
-
-            foreach (Rule rule in newGrammarList)
-            {
-                grammarList.Add(rule);
-            }
-        }
         public List<TerminalList> GetTerminalList()
         {
             return terminalList;
-        }
-        public void SetTerminalList(List<TerminalList> newTerminalList)
-        {
-            terminalList.Clear();
-            foreach(TerminalList element in newTerminalList)
-            {
-                terminalList.Add(element);
-            }
         }
         public List<IndexOfTerminal> GetIndexOfTerminalList()
         {
             return indexOfTerminalList;
         }
+        public List<RowInTable> GetGrammarTable()
+        {
+            return table;
+        }
+
         public void SetTerminalIndexList(List<IndexOfTerminal> newIndexOfTerminalList)
         {
             indexOfTerminalList.Clear();
@@ -95,9 +83,22 @@ namespace lexer
                 indexOfTerminalList.Add(element);
             }
         }
-        public List<RowInTable> GetGrammarTable()
+        public void SetTerminalList(List<TerminalList> newTerminalList)
         {
-            return table;
+            terminalList.Clear();
+            foreach (TerminalList element in newTerminalList)
+            {
+                terminalList.Add(element);
+            }
+        }
+        public void SetGrammarList(List<Rule> newGrammarList)
+        {
+            grammarList.Clear();
+
+            foreach (Rule rule in newGrammarList)
+            {
+                grammarList.Add(rule);
+            }
         }
 
         public void PrintTerminalList()
@@ -250,9 +251,7 @@ namespace lexer
         private void AddNotTerminalToList(string notTerminal, ref List<string> list)
         {
             if (!list.Contains(notTerminal))
-            {
                 list.Add(notTerminal);
-            }
         }
 
         public void InitializeStartRule()
@@ -268,7 +267,6 @@ namespace lexer
             newRule.ruleСomposition = currComposition;
             newRule.guideSet = new List<string>();
 
-
             bool isExist = terminalList.Exists(x => x.terminal == terminal);
             if (isExist)
             {
@@ -277,10 +275,8 @@ namespace lexer
             } else
             {
                 TerminalList newTerminalList;
-
                 newTerminalList.terminal = terminal;
-                newTerminalList.index = new List<int>() { 1 };
-     
+                newTerminalList.index = new List<int>() { 1 };     
                 terminalList.Add(newTerminalList);
             }
 
@@ -422,21 +418,16 @@ namespace lexer
                     break;
             }
 
-
             int before = rule.guideSet.Count();
-
             int guideSetForRuleSize = guideSetForRule.Count();
+
             for (int i = 0; i < guideSetForRuleSize; i++)
-            {
                 AddNotTerminalToList(guideSetForRule[i], ref rule.guideSet);
-            }
 
             int after = rule.guideSet.Count();
-
-            if (before != after) 
-            {
+ 
+            if (before != after)
                 isChanges = true;
-            }
         }
 
         public void DefineGuideSet() {
@@ -453,9 +444,7 @@ namespace lexer
                 isChanges = false;
 
                 foreach (Rule rule in grammarList)
-                {
                     OperateRule(rule, ref isFirstRule, ref currGuideSet, ref currSet, currWord, ref currName, ref isChanges);
-                }
 
                 if ((currName != "") && (currSet.Count != 0))
                 {
@@ -512,9 +501,7 @@ namespace lexer
             bool isLastRuleForTerminate = (indexInTerminalList == currList.Count() - 1);
 
             if (isFirstElement && !isLastRuleForTerminate)
-            {
                 newRow.errorTransit = position + elementAmount;
-            }
         }
 
         private void AddIsShiftToRow(ref RowInTable newRow, Rule currRule, string element)
@@ -523,10 +510,7 @@ namespace lexer
 
             string elementType = DefineStringType(element);
             if (elementType == NOT_TERMINAL)
-            {
                 newRow.isShift = true;
-            }
-
         }
 
         private void AddIsStackToRow(ref RowInTable newRow, Rule currRule, string element)
@@ -539,9 +523,7 @@ namespace lexer
             bool isEndInComPosition = (elementIndex == (elementAmount - 1));
 
             if (!isEndInComPosition && (elementType == TERMINAL))
-            {
                 newRow.isStack = true;
-            }
         }
 
         private void AddGoToToRow(ref RowInTable newRow, Rule currRule, string element, int position)
@@ -552,9 +534,7 @@ namespace lexer
             bool isEndInComPosition = (elementIndex == (elementAmount - 1));
 
             if ((elementType == NOT_TERMINAL) && (!isEndInComPosition))
-            {
                 newRow.goTo = position + 1;
-            }
 
             if (elementType == TERMINAL)
             {
@@ -587,9 +567,7 @@ namespace lexer
                 }
                 row++;
             }
-
             return table;
         }
-
     }
 }

@@ -21,15 +21,15 @@ namespace lexer
             LeftRecursion leftRecursion = new LeftRecursion();
             leftRecursion.ApplyLeftRecursion(ref grammarConverter);
 
-            //grammarConverter.DefineGuideSet();
+            grammarConverter.DefineGuideSet();
 
             //grammarConverter.PrintTerminalList();
             //grammarConverter.PrintGuideSet();
             //grammarConverter.PrintIndex();
             grammarConverter.PrintGrammarList();
 
-            //List<RowInTable> table = grammarConverter.CreateTable();
-            //grammarConverter.PrintTable();
+            List<RowInTable> table = grammarConverter.CreateTable();
+            grammarConverter.PrintTable();
 
             Console.ReadKey();
         }

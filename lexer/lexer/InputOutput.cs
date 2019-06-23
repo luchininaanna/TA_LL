@@ -11,13 +11,15 @@ namespace lexer
     {
         public InputOutput(){}
 
+        private const int START_RULE_ELEMENT_AMOUNT = 2;
+
         public void ExtractData(ref GrammarConverter grammarConverter)
         {
-            System.IO.StreamReader file = new System.IO.StreamReader("recursion_test_2.txt");
+            System.IO.StreamReader file = new System.IO.StreamReader("recursion_test_3.txt");
 
             string line;
             int rawIndex = 0;
-            int wordIndex = 2;
+            int wordIndex = START_RULE_ELEMENT_AMOUNT;
 
             while ((line = file.ReadLine()) != null)
             {
@@ -31,7 +33,7 @@ namespace lexer
                 PutDataToStracture(words, ref grammarList);
                 AddComponentsToTerminalList(words, rawIndex, ref terminalList);
                 UpdateTerminalIndexList(words[0], wordIndex, rawIndex, ref indexOfTerminalList);
-                wordIndex += words.Count() - 2;
+                wordIndex += words.Count() - START_RULE_ELEMENT_AMOUNT;
             }
 
         }
@@ -45,9 +47,7 @@ namespace lexer
             List<string> currComposition = new List<string>();
 
             for (int i = 2; i < amount; i++)
-            {
                 currComposition.Add(words[i]);
-            }
 
             newRule.ruleСomposition = currComposition;
             newRule.guideSet = new List<string>();
@@ -58,17 +58,13 @@ namespace lexer
         private void AddComponentsToTerminalList(string[] words, int rawIndex, ref List<TerminalList> terminalList)
         {
             int amount = words.Length;
-
             for (int i = 1; i < amount; i++)
             {
                 string currWord = words[i];
-
-                //проверка на терминал
-                if ((currWord[0] == '<') && (currWord[currWord.Length - 1] == '>'))
+                bool isTerminal = (currWord[0] == '<') && (currWord[currWord.Length - 1] == '>');
+                if (isTerminal)
                 {
-                    //поиск терминала в существующем списке
                     bool isExist = terminalList.Exists(x => x.terminal.Contains(currWord));
-
                     if (!isExist)
                     {
                         TerminalList newTerninal;
@@ -78,7 +74,6 @@ namespace lexer
                         terminalList.Add(newTerninal);
                     } else
                     {
-                        //узнать индекс
                         TerminalList currTerminalList = terminalList.Find(x => x.terminal.Contains(currWord));
                         currTerminalList.index.Add(rawIndex + 1);
                     }
@@ -90,7 +85,6 @@ namespace lexer
             ref List<IndexOfTerminal> indexOfTerminalList)
         {
             bool isExist = indexOfTerminalList.Exists(x => x.terminal == terminal);
-
             if (!isExist)
             {
                 IndexOfTerminal newIndexOfTerminal;
