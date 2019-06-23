@@ -335,7 +335,7 @@ namespace lexer
             for (int i = 0; i < indexAmount; i++)
             {
                 int currIndex = currTerminalList.index[i];
-                Rule currRule = grammarList[currIndex - 1];
+                Rule currRule = grammarList[currIndex];
                 List<string> ruleСomposition = currRule.ruleСomposition;
                 int elementIndex = ruleСomposition.FindIndex(x => x == terminal);
 

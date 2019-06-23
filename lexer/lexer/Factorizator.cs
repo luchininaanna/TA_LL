@@ -28,9 +28,6 @@ namespace lexer
 
         public void ApplyFactorization(ref GrammarConverter grammarConverter)
         {
-            Console.WriteLine();
-            Console.WriteLine("CONVERT FANCTION!!!!!!!!!");
-            Console.WriteLine();
 
             while (isNeedToRepeatFactorization)
             {
@@ -54,7 +51,6 @@ namespace lexer
                 UpdateTerminalList();
                 grammarConverter.SetTerminalList(newTerminalList);
 
-                grammarConverter.PrintGrammarList();
 
                 newGrammarList.Clear();
                 newIndexOfTerminal.Clear();
@@ -129,8 +125,6 @@ namespace lexer
             string rule = dataForFacotization[index].rule;
             string commonElement = dataForFacotization[index].commonElement;
 
-            Console.WriteLine("commonElement = " + commonElement);
-
             Rule newRule = new Rule();
             newRule.ruleName = rule;
             newRule.guideSet = new List<string>();
@@ -153,12 +147,10 @@ namespace lexer
                 {
                     for (int j = 1; j < currRule.ruleСomposition.Count(); j++)
                     {
-                        Console.WriteLine("add " + currRule.ruleСomposition[j]);
                         newRule.ruleСomposition.Add(currRule.ruleСomposition[j]);
                     }
                 } else
                 {
-                    Console.WriteLine("add ");
                     newRule.ruleСomposition.Add("[уь]");
                 }
 

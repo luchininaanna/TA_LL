@@ -18,11 +18,14 @@ namespace lexer
             Factorizator factorizator = new Factorizator();
             factorizator.ApplyFactorization(ref grammarConverter);
 
+            LeftRecursion leftRecursion = new LeftRecursion();
+            leftRecursion.ApplyLeftRecursion(ref grammarConverter);
+
             //grammarConverter.DefineGuideSet();
 
-            grammarConverter.PrintTerminalList();
-            grammarConverter.PrintGuideSet();
-            grammarConverter.PrintIndex();
+            //grammarConverter.PrintTerminalList();
+            //grammarConverter.PrintGuideSet();
+            //grammarConverter.PrintIndex();
             grammarConverter.PrintGrammarList();
 
             //List<RowInTable> table = grammarConverter.CreateTable();

@@ -43,6 +43,7 @@
     <Compile Include="Factorizator.cs" />
     <Compile Include="GrammarConverter.cs" />
     <Compile Include="InputOutput.cs" />
+    <Compile Include="LeftRecursion.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
