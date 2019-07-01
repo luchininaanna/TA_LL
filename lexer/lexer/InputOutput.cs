@@ -13,9 +13,9 @@ namespace lexer
 
         private const int START_RULE_ELEMENT_AMOUNT = 2;
 
-        public void ExtractData(ref GrammarConverter grammarConverter)
+        public void ExtractGrammarData(ref GrammarConverter grammarConverter)
         {
-            System.IO.StreamReader file = new System.IO.StreamReader("recursion_test_3.txt");
+            System.IO.StreamReader file = new System.IO.StreamReader("test_3.txt");
 
             string line;
             int rawIndex = 0;

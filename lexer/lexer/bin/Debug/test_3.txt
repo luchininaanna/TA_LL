@@ -1,0 +1,7 @@
+<S> -> <A> <B> <C> d
+<A> -> [empty]
+<A> -> <A> a
+<B> -> [empty]
+<B> -> <B> b
+<C> -> [empty]
+<C> -> <C> c

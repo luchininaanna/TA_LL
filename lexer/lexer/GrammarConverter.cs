@@ -225,27 +225,27 @@ namespace lexer
         }
         public void PrintTable()
         {
-            Console.WriteLine(" name | isEnd | guideSet | errorTransit | isShift | isStack | goTo |");
-            Console.WriteLine("--------------------------------------------------------------------");
-
-            foreach (RowInTable row in table)
+            Console.WriteLine("-----------------------------------------------------------------------------------------------------------");
+            for (int i = 0; i < table.Count; i++)
             {
-                Console.Write(" " + row.name + "  |");
-                Console.Write("  " + row.isEnd + "  |");
+                RowInTable row = table[i];
 
-                foreach(string el in row.guideSet)
+                Console.Write(" №:" + i);
+                Console.Write("  Name:" + row.name);
+                Console.Write("  IsEnd:" + row.isEnd);
+
+                Console.Write("  GuideSet:");
+                foreach (string el in row.guideSet)
                 {
                     Console.Write(el + ", ");
                 }
-                Console.Write("  |");
 
-                Console.Write("  " + row.errorTransit + "  |");
-                Console.Write("  " + row.isShift + "  |");
-                Console.Write("  " + row.isStack + "  |");
-                Console.WriteLine("  " + row.goTo + "  |");
-                Console.WriteLine("--------------------------------------------------------------------");
+                Console.Write("  ErrorTransit:" + row.errorTransit);
+                Console.Write("  IsShift:" + row.isShift);
+                Console.Write("  IsStack:" + row.isStack);
+                Console.WriteLine("  GoTo:" + row.goTo);
             }
-
+            Console.WriteLine("-----------------------------------------------------------------------------------------------------------");
         }
 
         private void AddNotTerminalToList(string notTerminal, ref List<string> list)
@@ -289,7 +289,8 @@ namespace lexer
             grammarList.Insert(0, newRule);
         }
 
-        private void FindTerminalSet(string terminal, ref List<string> currSet, ref List<string> guideSetForRule)
+        private void FindTerminalSet(string terminal, ref List<string> currSet, ref List<string> guideSetForRule, 
+            ref bool isNeedToCheckNextSymbol)
         {
             bool isExist = guideSet.Exists(x => x.ruleName == terminal);
 
@@ -300,6 +301,11 @@ namespace lexer
 
                 for (int j = 0; j < additionSetSize; j++)
                 {
+                    if (additionSet.set[j] == END)
+                    {
+                        isNeedToCheckNextSymbol = true;
+                    }
+
                     AddNotTerminalToList(additionSet.set[j], ref currSet);
                     AddNotTerminalToList(additionSet.set[j], ref guideSetForRule);
                 }
@@ -343,7 +349,8 @@ namespace lexer
                     switch (newtElementType)
                     {
                         case TERMINAL:
-                            FindTerminalSet(nextElement, ref currSet, ref guideSetForRule);
+                            bool isNeedToCheckNextSymbol = false;
+                            FindTerminalSet(nextElement, ref currSet, ref guideSetForRule, ref isNeedToCheckNextSymbol);
                             break;
                         case NOT_TERMINAL:
                             AddNotTerminalToList(nextElement, ref currSet);
@@ -374,6 +381,118 @@ namespace lexer
             }
         }
 
+        private void FindTerminalSetWithEnd(string terminal, ref List<string> currSet, ref List<string> guideSetForRule, ref bool isFirstRule)
+        {
+            bool isExist = terminalList.Exists(x => x.terminal == terminal);
+            
+            if (isExist)
+            {
+                TerminalList currTerminalList = terminalList.Find(x => x.terminal.Contains(terminal));
+                int indexAmount = currTerminalList.index.Count();
+
+                for (int i = 0; i < indexAmount; i++)
+                {
+                    int currIndex = currTerminalList.index[i];
+                    Rule currRule = grammarList[currIndex];
+                    List<string> ruleСomposition = currRule.ruleСomposition;
+                    int elementIndex = ruleСomposition.FindIndex(x => x == terminal);
+
+                    if (elementIndex < ruleСomposition.Count() - 1)
+                    {
+                        string nextElement = ruleСomposition[elementIndex + 1];
+                        string newtElementType = DefineStringType(nextElement);
+
+                        bool isEndInSet = false;
+
+                        switch (newtElementType)
+                        {
+                            case TERMINAL:
+                                bool isExist1 = guideSet.Exists(x => x.ruleName == nextElement);
+                                if (isExist1)
+                                {
+                                    GuideSet currGuideSet = guideSet.Find(x => x.ruleName == nextElement);
+
+                                    foreach (string setElement in currGuideSet.set)
+                                    {
+
+                                        if (setElement == END)
+                                            isEndInSet = true;
+
+                                        AddNotTerminalToList(setElement, ref currSet);
+                                        AddNotTerminalToList(setElement, ref guideSetForRule);
+                                    }
+                                }
+
+                                if (isEndInSet)
+                                    FindTerminalSetWithEnd(nextElement, ref currSet, ref guideSetForRule, ref isFirstRule);
+
+                                break;
+                            case NOT_TERMINAL:
+
+                                AddNotTerminalToList(nextElement, ref currSet);
+                                AddNotTerminalToList(nextElement, ref guideSetForRule);
+                                break;
+                        }
+
+                    }
+                }
+            }
+           
+        }
+
+        private void Redirect(string ruleName, string currWord, ref List<string> currSet, 
+            ref List<string> guideSetForRule, ref bool isFirstRule, int indexInComposition)
+        {
+            string wordType = DefineStringType(currWord);
+
+            switch (wordType)
+            {
+                case TERMINAL:
+                    
+                    bool isNeedToCheckNextSymbol = false;
+                    FindTerminalSet(currWord, ref currSet, ref guideSetForRule, ref isNeedToCheckNextSymbol);
+                    
+                    Rule rule = grammarList.Find(x => x.ruleName == ruleName);
+                    bool isCanBeEND = IsInThisRuleEND(rule.ruleСomposition);
+
+                    
+                    while (isNeedToCheckNextSymbol)
+                    {
+                        indexInComposition++;
+                        if (rule.ruleСomposition.Count() > indexInComposition)
+                        {
+                            string newWord = rule.ruleСomposition[indexInComposition];
+                            if (newWord != END)
+                                FindTerminalSet(newWord, ref currSet, ref guideSetForRule, ref isNeedToCheckNextSymbol);
+                        }
+                        else
+                            isNeedToCheckNextSymbol = false;
+                    }
+
+                    
+                    if (guideSetForRule.Contains(END))
+                    {
+                        FindTerminalSetWithEnd(ruleName, ref currSet, ref guideSetForRule, ref isFirstRule);
+                    }
+
+                    if (!isCanBeEND)
+                    {
+                        guideSetForRule.Remove(END);
+                        currSet.Remove(END);
+                    }
+                    
+                    break;
+                case EMPTY:
+                    FindEmptyTerminalSet(ruleName, ref currSet, ref guideSetForRule, ref isFirstRule);
+                    break;
+                case NOT_TERMINAL:
+                    AddNotTerminalToList(currWord, ref currSet);
+                    AddNotTerminalToList(currWord, ref guideSetForRule);
+                    isFirstRule = false;
+                    break;
+            }
+        }
+
         private void OperateRule(Rule rule, ref bool isFirstRule, ref GuideSet currGuideSet, 
             ref List<string> currSet, string currWord, ref string currName, ref bool isChanges)
         {
@@ -399,30 +518,19 @@ namespace lexer
                 currSet = new List<string>();
             }
 
-            currWord = rule.ruleСomposition[0];
-            string wordType = DefineStringType(currWord);
+            int indexInComposition = 0;
+            currWord = rule.ruleСomposition[indexInComposition];
 
-            switch (wordType)
-            {
-                case TERMINAL:
-                    FindTerminalSet(currWord, ref currSet, ref guideSetForRule);
-                    isFirstRule = false;
-                    break;
-                case EMPTY:
-                    FindEmptyTerminalSet(rule.ruleName, ref currSet, ref guideSetForRule, ref isFirstRule);
-                    break;
-                case NOT_TERMINAL:
-                    AddNotTerminalToList(currWord, ref currSet);
-                    AddNotTerminalToList(currWord, ref guideSetForRule);
-                    isFirstRule = false;
-                    break;
-            }
+            Redirect(rule.ruleName, currWord, ref currSet, ref guideSetForRule, ref isFirstRule, indexInComposition);
 
             int before = rule.guideSet.Count();
             int guideSetForRuleSize = guideSetForRule.Count();
 
             for (int i = 0; i < guideSetForRuleSize; i++)
+            {
                 AddNotTerminalToList(guideSetForRule[i], ref rule.guideSet);
+                AddNotTerminalToList(guideSetForRule[i], ref rule.guideSet);
+            }
 
             int after = rule.guideSet.Count();
  
@@ -430,11 +538,25 @@ namespace lexer
                 isChanges = true;
         }
 
+        private bool IsInThisRuleEND(List<string> ruleСomposition)
+        {
+            int elementAmount = ruleСomposition.Count();
+            string lastElement = ruleСomposition[elementAmount - 1];
+            string elementType = DefineStringType(lastElement);
+
+            if ((elementType == NOT_TERMINAL) && (lastElement != END))
+                return false;
+
+            return true;
+        }
+
         public void DefineGuideSet() {
 
             string currName = "";
             string currWord = "";
             GuideSet currGuideSet = new GuideSet();
+            List<string> set = new List<string>();
+            currGuideSet.set = set;
             List<string> currSet = new List<string>();
             bool isFirstRule = false;
             bool isChanges = true;
@@ -444,15 +566,25 @@ namespace lexer
                 isChanges = false;
 
                 foreach (Rule rule in grammarList)
+                {
                     OperateRule(rule, ref isFirstRule, ref currGuideSet, ref currSet, currWord, ref currName, ref isChanges);
 
-                if ((currName != "") && (currSet.Count != 0))
-                {
-                    currGuideSet.set = currSet;
-                    string ruleName = currGuideSet.ruleName;
-                    bool isExist = guideSet.Exists(x => x.ruleName == ruleName);
-                    if (!isExist)
-                        guideSet.Add(currGuideSet);
+                    if ((currName != "") && (currSet.Count != 0))
+                    {
+                        currGuideSet.set = currSet;
+                        string ruleName = currGuideSet.ruleName;
+                        bool isExist = guideSet.Exists(x => x.ruleName == ruleName);
+                        if (!isExist)
+                            guideSet.Add(currGuideSet);
+                        else
+                        {
+                            List<string> setFor = guideSet.Find(x => x.ruleName == ruleName).set;
+                            List<string> startSet = currGuideSet.set;
+
+                            foreach (string element in startSet)
+                                AddNotTerminalToList(element, ref setFor);
+                        }
+                    }
                 }
             }
         }

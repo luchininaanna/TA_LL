@@ -5,7 +5,6 @@ using System.Text;
 
 namespace lexer
 {
-
     struct DataForFactorization
     {
         public string rule;

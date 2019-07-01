@@ -41,10 +41,6 @@ namespace lexer
             grammarConverter.SetTerminalIndexList(newIndexOfTerminal);
             UpdateTerminalList();
             grammarConverter.SetTerminalList(newTerminalList);
-
-            grammarConverter.PrintGrammarList();
-            grammarConverter.PrintTerminalList();
-            grammarConverter.PrintIndex();
         }
 
         private void AddRulesWithoutRecursion(ref GrammarConverter grammarConverter)
@@ -86,7 +82,8 @@ namespace lexer
                     rule.ruleСomposition = new List<string>();
 
                     foreach (string element in grammarList[row].ruleСomposition)
-                        rule.ruleСomposition.Add(element);
+                        if(element != "[empty]")
+                            rule.ruleСomposition.Add(element);
 
                     rule.ruleСomposition.Add(newRule);
 
@@ -183,6 +180,5 @@ namespace lexer
         }
     }
 }
-
 
 //!Предполагается, что из саморекурсивного нетерминала следует максимум 2 альтернативы

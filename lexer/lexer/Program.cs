@@ -12,7 +12,7 @@ namespace lexer
             InputOutput fileHandler = new InputOutput();
             GrammarConverter grammarConverter = new GrammarConverter();
 
-            fileHandler.ExtractData(ref grammarConverter);
+            fileHandler.ExtractGrammarData(ref grammarConverter);
             grammarConverter.InitializeStartRule();
 
             Factorizator factorizator = new Factorizator();
@@ -24,12 +24,15 @@ namespace lexer
             grammarConverter.DefineGuideSet();
 
             //grammarConverter.PrintTerminalList();
-            //grammarConverter.PrintGuideSet();
-            //grammarConverter.PrintIndex();
+            grammarConverter.PrintGuideSet();
             grammarConverter.PrintGrammarList();
+            //grammarConverter.PrintIndex();
 
             List<RowInTable> table = grammarConverter.CreateTable();
-            grammarConverter.PrintTable();
+            //grammarConverter.PrintTable();
+
+            Runner runner = new Runner();
+            runner.ProcessSequenceFromFile(ref table);
 
             Console.ReadKey();
         }
