@@ -10,14 +10,14 @@ namespace lexer
     {
         public Runner() { }
 
+        const string EMPTY_STRING = "&";
         Stack<int> states;
         int currState;
         int wordLength;
         int indexInWord;
         string currWord;
         bool isOk;
-
-
+        bool withoutReading;
 
         public void ProcessSequenceFromFile(ref List<RowInTable> table)
         {
@@ -32,7 +32,15 @@ namespace lexer
                 foreach (string word in words)
                 {
                     bool isRightSequence = IsRightSecuence(word, ref table);
-                    Console.WriteLine(word + " " + isRightSequence);
+
+                    if (word != EMPTY_STRING)
+                    {
+                        Console.WriteLine(word + " " + isRightSequence);
+                    } else
+                    {
+                        Console.WriteLine("{empty string} " + isRightSequence);
+                    }
+                    
                 }
             }
         }
@@ -45,36 +53,53 @@ namespace lexer
             currWord = word;
             wordLength = currWord.Length;
             states = new Stack<int>();
+            withoutReading = false;
 
-            AnalyzeStateWithSymbol(ref table);
-
-            Console.WriteLine();
+            if (word != EMPTY_STRING)
+            {
+                AnalyzeStateWithSymbol(ref table);
+            } else
+            {
+                AnalyzeEmptyString(ref table);
+            }
+            
 
             return isOk;
         }
 
+
         private void AnalyzeStateWithSymbol(ref List<RowInTable> table)
         {
+            RowInTable currRow;
             bool isEnd = (indexInWord > wordLength - 1);
             
             if (isEnd)
             {
-                isOk = (currState == 1);
-                Console.WriteLine("currState " + currState);
+                if (states.Count() == 0)
+                {
+                    isOk = (currState == 1);
+                    return;
+                }
+                else
+                {
+                    withoutReading = true;
+                }     
             }
-            //Console.WriteLine("currState " + currState);
-            //Console.WriteLine("indexInWord " + indexInWord);
-            //Console.WriteLine("stack " + states.Count());
-            //Console.WriteLine("symbol  " + currWord[indexInWord]);
-            //Console.WriteLine();
 
 
-            if ((wordLength > indexInWord) && !isEnd)
+            if ((wordLength > indexInWord) || withoutReading)
             {
-                RowInTable currRow = table[currState];
+                currRow = table[currState];
 
                 //проверяем входит ли символ в напраляющее множество
-                string symbol = "" + currWord[indexInWord];
+                string symbol = "";
+                if (!withoutReading)
+                {
+                    symbol = "" + currWord[indexInWord];
+                } else 
+                {
+                    symbol = "[end]";
+                }
 
                 if (currRow.guideSet.Contains(symbol))
                 {
@@ -87,7 +112,14 @@ namespace lexer
                     //чтение нового символа
                     if (currRow.isShift)
                     {
-                        indexInWord++;
+                        if (!withoutReading)
+                        {
+                            indexInWord++;
+                        } else
+                        {
+                            isOk = false;
+                            //return;
+                        }
                     }
 
                     //переход в новое состояние
@@ -104,7 +136,7 @@ namespace lexer
                             AnalyzeStateWithSymbol(ref table);
                         } else
                         {
-                            Console.WriteLine("ERROR 1");
+                            return;
                         }
                     }
 
@@ -124,12 +156,19 @@ namespace lexer
                         }
                         else
                         {
-                            Console.WriteLine("ERROR 2");
+                            //isOk = false;
+                            return;
                         }
                     }
                 }
 
             }
+        }
+
+        private void AnalyzeEmptyString(ref List<RowInTable> table)
+        {
+            RowInTable currRow = table[0];
+            isOk = currRow.guideSet.Contains("[end]");
         }
     }
 

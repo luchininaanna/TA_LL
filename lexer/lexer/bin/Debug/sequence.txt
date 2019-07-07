@@ -10,3 +10,13 @@ bcd
 acd
 abd
 ac
+acd
+ab
+bc
+a
+b
+c
+&
+aaaaaaaaac
+bbbbbbbb
+cccccccccccccc
